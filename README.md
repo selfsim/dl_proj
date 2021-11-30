@@ -11,6 +11,12 @@ Support for hyperparameter grid search
 
 Exports data to Comet.ML for analysis
 
+# # installation
+
+pip3 install comet_ml
+
+install pytorch
+
 ## Training:
 
 From the command line:
