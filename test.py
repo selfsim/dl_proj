@@ -31,7 +31,7 @@ class tester():
             root="./../data",
             train=False,
             download=True,
-            transform= preprocess if self.vars['preprocess'] else ToTensor()
+            transform= preprocess
         )
 
         self.dataloader = self.get_data_loader()
