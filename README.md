@@ -11,7 +11,7 @@ Support for hyperparameter grid search
 
 Exports data to Comet.ML for analysis
 
-# # installation
+## Configuration
 
 pip3 install comet_ml
 
