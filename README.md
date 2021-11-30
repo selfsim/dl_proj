@@ -28,4 +28,6 @@ python ./test.py --load-path "./path/to/saved/model"
 shows test accuracy
 
 
+Some experimental results shown in results subdirectory
+
 All code contained in this project is my own or from the pytorch intro tutorial, unless specified otherwise.
