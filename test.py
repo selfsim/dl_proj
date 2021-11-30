@@ -1,3 +1,4 @@
+# python ./test.py --help
 from torch import nn as nn
 from torch.utils.data import DataLoader 
 from torchvision import datasets, transforms
@@ -33,23 +34,17 @@ class tester():
             transform= preprocess if self.vars['preprocess'] else ToTensor()
         )
 
-        # get data
         self.dataloader = self.get_data_loader()
 
-        # load the model
         self.load_model()
 
-        # test the model
         self.test_model()
 
     def load_model(self):
         checkpoint = torch.load(self.vars['load_path'])
         self.vars.update(checkpoint)
 
-        self.vars["device"] = torch.device(
-            "cuda" if self.vars["use_cuda"] == True and torch.cuda.is_available() 
-            else "cpu"
-        )
+        self.vars["device"] = torch.device("cuda" if self.vars["use_cuda"] == True and torch.cuda.is_available() else "cpu")
         self.vars['_model'] = self.get_model()
         self.vars["_model"] = self.get_model().to(self.vars["device"])
         self.vars['_model'].load_state_dict(checkpoint['model_state_dict'])

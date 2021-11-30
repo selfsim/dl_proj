@@ -1,11 +1,12 @@
 # python ./train.py --help
 from comet_ml import Experiment, ExistingExperiment, API
 from torch import nn as nn
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from models.archs import *
 from sklearn.model_selection import train_test_split
 from math import inf
+from models.archs import nn_models
 import argparse
 import pathlib
 import torch
@@ -13,6 +14,7 @@ import torch.optim as optim
 
 torch.manual_seed(1)
 
+# logging API vars
 api_key = "33KRTNcG2iva0PuiNfXhEqcRr"
 api = API(api_key=api_key)
 
@@ -59,8 +61,6 @@ class trainer():
     def __init__(self, args):
         self.vars = vars(args)  
 
-        trainer.classes = 100
-
         if(self.vars['task'] == 'load'):
             self.load_model()
         else:
@@ -69,12 +69,14 @@ class trainer():
     # # # model initialization functions # # #
     def init_model(self):
 
+        # logging purposes
         trainer.experiment = Experiment(
             api_key="33KRTNcG2iva0PuiNfXhEqcRr",
             project_name="dl",
             workspace="selfsim",
         )
 
+        # initialize vars
         self.vars["device"] = torch.device("cuda" if self.vars["use_cuda"] == True and torch.cuda.is_available() else "cpu")
         self.vars['name'] = self.vars['save_path'].stem        
         self.vars['loss_function'] = "crossentropy"
@@ -88,6 +90,7 @@ class trainer():
         
     def load_model(self):
 
+        # set up variable tracking 
         self.vars['name'] = self.vars['save_path'].stem
         api_experiment = api.get_experiment("selfsim", "dl", self.vars["name"])
         self.vars['experiment_key'] = api_experiment.key
@@ -107,13 +110,12 @@ class trainer():
         trainer.experiment.set_step(step)
         trainer.experiment.set_epoch(epoch)
 
+        # load information from file
         checkpoint = torch.load(load_path)
         self.vars.update(checkpoint)
 
-        self.vars["device"] = torch.device(
-            "cuda" if self.vars["use_cuda"] == True and torch.cuda.is_available() 
-            else "cpu"
-        )
+        # init vars
+        self.vars["device"] = torch.device("cuda" if self.vars["use_cuda"] == True and torch.cuda.is_available() else "cpu")
         self.vars["_train_dataloader"], self.vars["_validation_dataloader"], self.vars["_test_dataloader"] = self.get_data_loaders()
         self.vars['_model'] = self.get_model()
         self.vars["_model"] = self.get_model().to(self.vars["device"])
@@ -166,6 +168,7 @@ class trainer():
             trainer.experiment.log_metric("val_loss", val_loss, epoch=e)
             trainer.experiment.log_metric("val_acc", val_acc, epoch=e)
 
+            # for logging purposes
             test_loss, test_acc = self.test(test_dataloader, "Testing")
             trainer.experiment.log_metric("test_loss", test_loss, epoch=e)
             trainer.experiment.log_metric("test_acc", test_acc, epoch=e)
